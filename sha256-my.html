@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<script src="sha256-o2.js"></script>
+	<script>
+		function sha256(str) {
+			var digestPtr = Module.allocate(65, '', Module.ALLOC_STACK),
+				message = Module.intArrayFromString(str, true),
+				messagePtr = Module.allocate(message, 'i8', Module.ALLOC_STACK)
+			Module._sha256(messagePtr, message.length, digestPtr)
+			return Module.Pointer_stringify(digestPtr)
+		}
+	</script>
+</head>
+
+<body>
+
+</body>
+
+</html>
