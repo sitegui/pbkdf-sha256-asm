@@ -1,40 +1,33 @@
+#include <assert.h>
 #include "pbkdf.h"
 #include "hmac.h"
 
-/*void pbkdf_sha256(buffer password, buffer salt, word blockIndex, int rounds, digest out) {
-	hmac_sha256_context hmac;
-	buffer index = buffer_create_from_word(blockIndex+1);
-	digest block;
+void pbkdf(buffer password, buffer salt, word block_index, int rounds, buffer *key) {
+	assert(key->length == 32);
 	
-	hmac_sha256_init(hmac, password);
+	hmac base_mac = hmac_init(password), mac;
+	buffer temp = buffer_calloc(32);
 	
 	// First iteration
-	// temp = block = HMAC(key, salt || blockIndex)
-	hmac_sha256_update(hmac, salt);
-	hmac_sha256_update(hmac, index);
-	hmac_sha256_end(hmac, block);
+	// U1 = HMAC(P, S || (i+1))
+	mac = hmac_clone(base_mac);
+	hmac_update(&mac, salt);
+	buffer index = buffer_calloc(4); // 1 word
+	index.words[0] = block_index+1;
+	hmac_update(&mac, index);
+	buffer_free(&index);
+	hmac_end(&mac, key);
+	buffer_copy(&temp, *key);
 	
-	// Iterate:
-	// temp = HMAC(key, temp)
-	// block ^= temp
+	// Next iterations
+	// U_(n+1) = U_n ^ HMAC(P, U_n)
 	for (int i=1; i<rounds; i++) {
-		hmac_sha256_update(hmac, block);
+		mac = hmac_clone(base_mac);
+		hmac_update(&mac, temp);
+		hmac_end(&mac, &temp);
+		buffer_xor(key, temp);
 	}
 	
-	/ *
-	var block = hmac.update(salt).finalize(WordArray.create([blockIndex + 1]))
-	hmac.reset()
-
-	
-	var intermediate = block
-	for (i = 1; i < 1000; i++) {
-		intermediate = hmac.finalize(intermediate)
-		hmac.reset()
-
-		for (j = 0; j < block.words.length; j++) {
-			block.words[j] ^= intermediate.words[j]
-		}
-	}
-
-	return block
-}*/
+	buffer_free(&temp);
+	hmac_free(&base_mac);
+}

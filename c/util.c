@@ -12,7 +12,7 @@ buffer buffer_calloc(word length) {
 	buffer b;
 	b.length = length;
 	b.w_length = length%4 ? (length>>2)+1 : length>>2;
-	b.words = calloc(b.w_length, sizeof(word));
+	b.words = length ? calloc(b.w_length, sizeof(word)) : NULL;
 	return b;
 }
 
@@ -72,12 +72,26 @@ buffer buffer_clone(buffer b) {
 	buffer r;
 	r.length = b.length;
 	r.w_length = b.w_length;
-	r.words = malloc(r.w_length*sizeof(word));
+	r.words = r.length ? malloc(r.w_length*sizeof(word)) : NULL;
 	for (int i=0; i<r.w_length; i++) {
 		r.words[i] = b.words[i];
 	}
 	
 	return r;
+}
+
+void buffer_copy(buffer *dest, buffer origin) {
+	assert(dest->length == origin.length);
+	for (int i=0; i<origin.w_length; i++) {
+		dest->words[i] = origin.words[i];
+	}
+}
+
+void buffer_xor(buffer *dest, buffer origin) {
+	assert(dest->length == origin.length);
+	for (int i=0; i<origin.w_length; i++) {
+		dest->words[i] ^= origin.words[i];
+	}
 }
 
 void buffer_push(buffer *b, buffer data) {

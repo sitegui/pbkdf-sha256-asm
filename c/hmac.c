@@ -38,6 +38,20 @@ hmac hmac_init(buffer key) {
 	return mac;
 }
 
+void hmac_free(hmac *context) {
+	sha_free(&context->hash_i);
+	sha_free(&context->hash_o);
+}
+
+hmac hmac_clone(hmac context) {
+	hmac mac;
+	
+	mac.hash_i = sha_clone(context.hash_i);
+	mac.hash_o = sha_clone(context.hash_o);
+	
+	return mac;
+}
+
 void hmac_update(hmac *context, buffer message) {
 	// Simply update the inner hash
 	sha_update(&context->hash_i, message);

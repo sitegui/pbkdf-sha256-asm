@@ -8,5 +8,6 @@ void test_buffer_realloc();
 void test_buffer_slice();
 void test_sha();
 void test_hmac();
+void test_pbkdf();
 
 #endif // TEST_H

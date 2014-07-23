@@ -8,7 +8,14 @@ typedef struct {
 	sha hash_i, hash_o;
 } hmac;
 
+// Initilize the HMAC context
+// It must be ended with hmac_end or freeded with hmac_free to not leak memory
 hmac hmac_init(buffer key);
+
+void hmac_free(hmac *context);
+
+// Return a clone of the given context
+hmac hmac_clone(hmac context);
 
 void hmac_update(hmac *context, buffer message);
 

@@ -33,6 +33,14 @@ buffer buffer_create_from_str(char *str);
 buffer buffer_create_from_hex(char *str);
 buffer buffer_clone(buffer b);
 
+// Copy the contents from one buffer to another
+// They MUST have the same length
+void buffer_copy(buffer *dest, buffer origin);
+
+// Apply the xor operation between buffer with the same length
+// The first buffer is modified
+void buffer_xor(buffer *a, buffer b);
+
 // Push more data to the end of a given buffer
 void buffer_push(buffer *b, buffer data);
 

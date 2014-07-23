@@ -46,6 +46,18 @@ sha sha_init() {
 	return context;
 }
 
+void sha_free(sha *context) {
+	buffer_free(&context->partial_data);
+}
+
+sha sha_clone(sha context) {
+	sha hash = context;
+	
+	hash.partial_data = buffer_clone(context.partial_data);
+	
+	return hash;
+}
+
 void sha_update(sha *context, buffer message) {
 	buffer_push(&context->partial_data, message);
 	word length = context->partial_data.length;
@@ -55,7 +67,9 @@ void sha_update(sha *context, buffer message) {
 		sha_process_block(context, context->partial_data.words+offset);
 	}
 	
-	buffer_slice(&context->partial_data, offset);
+	if (offset) {
+		buffer_slice(&context->partial_data, offset);
+	}
 }
 
 void sha_end(sha *context, buffer *digest) {

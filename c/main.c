@@ -8,5 +8,6 @@ int main() {
     test_buffer_slice();
     test_sha();
     test_hmac();
+    test_pbkdf();
     return 0;
 }

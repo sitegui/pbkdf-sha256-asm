@@ -27,30 +27,31 @@
 
 1405993253 source:c:\users\guilherme\programs\hmac-sha256-asm\c\hmac-sha256.c
 
-1406095406 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\main.c
+1406126252 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\main.c
 	"test.h"
 
-1406094268 c:\users\guilherme\programs\pbkdf-sha256-asm\c\util.h
+1406098430 c:\users\guilherme\programs\pbkdf-sha256-asm\c\util.h
 	<emscripten.h>
 
-1406095342 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\hmac.c
+1406127966 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\hmac.c
 	"hmac.h"
 
-1406094940 c:\users\guilherme\programs\pbkdf-sha256-asm\c\hmac.h
+1406098704 c:\users\guilherme\programs\pbkdf-sha256-asm\c\hmac.h
 	"util.h"
 	"sha.h"
 
-1406094631 c:\users\guilherme\programs\pbkdf-sha256-asm\c\sha.h
+1406098781 c:\users\guilherme\programs\pbkdf-sha256-asm\c\sha.h
 	"util.h"
 
-1406082267 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\pbkdf.c
+1406127957 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\pbkdf.c
+	<assert.h>
 	"pbkdf.h"
 	"hmac.h"
 
-1406078761 c:\users\guilherme\programs\pbkdf-sha256-asm\c\pbkdf.h
+1406097191 c:\users\guilherme\programs\pbkdf-sha256-asm\c\pbkdf.h
 	"util.h"
 
-1406094667 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\sha.c
+1406126830 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\sha.c
 	<assert.h>
 	"sha.h"
 
@@ -62,14 +63,14 @@
 
 1406090573 c:\users\guilherme\programs\pbkdf-sha256-asm\c\test\sha.h
 
-1406094348 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\util.c
+1406126091 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\util.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<assert.h>
 	"util.h"
 
-1406095413 c:\users\guilherme\programs\pbkdf-sha256-asm\c\test.h
+1406098863 c:\users\guilherme\programs\pbkdf-sha256-asm\c\test.h
 
 1406093871 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\test\util.c
 	<string.h>
@@ -78,9 +79,15 @@
 	"../test.h"
 	"../util.h"
 
-1406096489 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\test\hmac.c
+1406096513 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\test\hmac.c
 	<stdio.h>
 	<assert.h>
 	"../test.h"
 	"../hmac.h"
+
+1406125711 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\test\pbkdf.c
+	<assert.h>
+	<stdio.h>
+	"../test.h"
+	"../pbkdf.h"
 

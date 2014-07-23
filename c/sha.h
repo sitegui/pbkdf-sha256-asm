@@ -9,8 +9,13 @@ typedef struct {
 	buffer partial_data; // data waiting to be hashed
 } sha;
 
-// Create the sha context (always call sha_end to free memory)
+// Create the sha context (always call sha_end or sha_free to free memory)
 sha sha_init();
+
+void sha_free(sha *context);
+
+// Return a clone of the given context
+sha sha_clone(sha context);
 
 // Process more data
 void sha_update(sha *context, buffer message);
