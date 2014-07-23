@@ -17,7 +17,7 @@ buffer buffer_calloc(word length) {
 }
 
 void buffer_realloc(buffer *b, word length) {
-	word prev_w_length = b->w_length;
+	int prev_w_length = b->w_length;
 	b->length = length;
 	b->w_length = length%4 ? (length>>2)+1 : length>>2;
 	b->words = realloc(b->words, b->w_length*sizeof(word));
@@ -25,6 +25,12 @@ void buffer_realloc(buffer *b, word length) {
 	// Zero new memory
 	for (int i=prev_w_length; i<b->w_length; i++) {
 		b->words[i] = 0UL;
+	}
+	
+	// Zero previous memory
+	for (word i=length; i<4*b->w_length; i++) {
+		word mask = 0xff << (24 - 8*(i%4));
+		b->words[i>>2] &= ~mask;
 	}
 }
 
