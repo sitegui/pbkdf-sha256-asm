@@ -1,4 +1,5 @@
-#include "sha256.h"
+#include <string.h>
+#include "sha.h"
 
 #define S(n, x) ((x)<<(32-(n)) | (x)>>(n))
 
@@ -21,6 +22,39 @@ static const word K[64] = {
 	0x90befffaUL, 0xa4506cebUL, 0xbef9a3f7UL, 0xc67178f2UL
 };
 
+sha sha_init() {
+	sha context = {
+		{ // Initial state
+			0x6a09e667UL,
+			0xbb67ae85UL,
+			0x3c6ef372UL,
+			0xa54ff53aUL,
+			0x510e527fUL,
+			0x9b05688cUL,
+			0x1f83d9abUL,
+			0x5be0cd19UL
+		},
+		0,
+		{ // Empty buffer
+			NULL,
+			0
+		}
+	};
+	
+	return context;
+}
+
+void sha_update(sha *context, buffer message) {
+	// Concat previous buffer with this one
+	
+}
+
+buffer sha_end(sha *context) {
+	buffer b;
+	return b;
+}
+
+/*
 // Update the hash with a 512-bit message block
 static void update(word H[8], const word M[16]) {
 	word a = H[0],
@@ -73,8 +107,7 @@ static void update(word H[8], const word M[16]) {
 	H[7] += h;
 }
 
-void EMSCRIPTEN_KEEPALIVE sha256(const byte *message, word length, char digest[65]) {
-	// Intermediate hash value
+void EMSCRIPTEN_KEEPALIVE sha256_raw(const byte *message, word length, word digest[8]) {
 	word H[8] = {
 		0x6a09e667UL,
 		0xbb67ae85UL,
@@ -86,7 +119,7 @@ void EMSCRIPTEN_KEEPALIVE sha256(const byte *message, word length, char digest[6
 		0x5be0cd19UL
 	};
 	
-	word originalLength = length;
+	word original_length = length;
 	
 	// Process whole 64 byte blocks from the message
 	while (length >= 64) {
@@ -114,11 +147,21 @@ void EMSCRIPTEN_KEEPALIVE sha256(const byte *message, word length, char digest[6
 			block[i] = 0UL;
 		}
 	}
-	block[15] |= originalLength<<3;
+	block[15] |= original_length<<3;
 	update(H, block);
 	
 	// Write to output
 	for (int i=0; i<8; i++) {
-		encodeHex(H[i], digest+8*i);
+		digest[i] = H[i];
 	}
 }
+
+void EMSCRIPTEN_KEEPALIVE sha256(const char *message, char digest[65]) {
+	word digest_raw[8];
+	sha256_raw((byte*)message, (word)strlen(message), digestRaw);
+	
+	for (int i=0; i<8; i++) {
+		encodeHex(digest_raw[i], digest+8*i);
+	}
+}
+*/

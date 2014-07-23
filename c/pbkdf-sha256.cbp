@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="hmac-sha256" />
+		<Option title="pbkdf-sha256" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -31,17 +31,30 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="../sha256.c">
+		<Unit filename="hmac-sha256.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../sha256.h" />
-		<Unit filename="../util.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../util.h" />
+		<Unit filename="hmac-sha256.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
+			<Option weight="0" />
 		</Unit>
+		<Unit filename="pbkdf-sha256.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pbkdf-sha256.h" />
+		<Unit filename="sha256.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sha256.h" />
+		<Unit filename="test/sha256.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="test/sha256.h" />
+		<Unit filename="util.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="util.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

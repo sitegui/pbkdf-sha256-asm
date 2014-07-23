@@ -1,24 +1,123 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "util.h"
 
 // Convert a half byte to a char
 #define hb2char(hb) ((hb)<10 ? '0'+(hb) : 'a'+((hb)-10))
+#define char2hb(c) ((c)<'a' ? (c)-'0' : (c)-'a'+10)
 
-void encodeHex(const word data, char out[9]) {
-	int j = 0;
-	for (int i = 0; i < 4; i++) {
-		byte b = (data >> (24 - i * 8)) & 0xff;
-		out[j++] = hb2char(b >> 4);
-		out[j++] = hb2char(b & 0x0f);
-	}
-	out[j] = '\0';
+buffer buffer_calloc(word length) {
+	buffer b;
+	b.length = length;
+	b.w_length = length%4 ? (length>>2)+1 : length>>2;
+	b.words = calloc(b.w_length, sizeof(word));
+	return b;
 }
 
-void printBlock(const word *block, word length) {
-	char hex[9];
-	for (int i=0; i<length; i++) {
-		encodeHex(block[i], hex);
-		printf("\t%s\n", hex);
+void buffer_realloc(buffer *b, word length) {
+	word prev_w_length = b->w_length;
+	b->length = length;
+	b->w_length = length%4 ? (length>>2)+1 : length>>2;
+	b->words = realloc(b->words, b->w_length*sizeof(word));
+	
+	// Zero new memory
+	for (int i=prev_w_length; i<b->w_length; i++) {
+		b->words[i] = 0UL;
 	}
-	puts("");
+}
+
+void buffer_free(buffer *b) {
+	free(b->words);
+	b->words = NULL;
+}
+
+buffer buffer_create(byte *data, word length) {
+	buffer b = buffer_calloc(length);
+	
+	for (int i=0; i<length; i++) {
+		b.words[i>>2] |= data[i] << (24 - 8*(i%4));
+	}
+	
+	return b;
+}
+
+buffer buffer_create_from_str(char *str) {
+	return buffer_create((byte*)str, (word)strlen(str));
+}
+
+buffer buffer_create_from_hex(char *str) {
+	char c1, c2;
+	byte B;
+	int length = strlen(str)>>1;
+	buffer b = buffer_calloc(length);
+	
+	for (int i=0; i<length; i++) {
+		c1 = str[2*i];
+		c2 = str[2*i+1];
+		B = (char2hb(c1) << 4) + char2hb(c2);
+		b.words[i>>2] |= B << (24 - 8*(i%4));
+	}
+	
+	return b;
+}
+
+void buffer_push(buffer *b, buffer data) {
+	word prev_length = b->length;
+	int prev_w_length = b->w_length;
+	
+	buffer_realloc(b, b->length+data.length);
+	
+	// Copy new data
+	if (prev_length % 4 == 0) {
+		// Aligned: copy word by word
+		memcpy(b->words+prev_w_length, data.words, 4*data.w_length);
+	} else {
+		// Slow case: copy byte by byte
+		for (int i=0, j=prev_length; i<data.length; i++, j++) {
+			word w = data.words[i>>2];
+			byte B = (w >> (24 - 8*(i%4))) & 0xff;
+			b->words[j>>2] |= B << (24 - 8*(j%4));
+		}
+	}
+}
+
+void buffer_encode(buffer b, char *hex) {
+	int i;
+	for (i=0; i<b.length; i++) {
+		word w = b.words[i>>2];
+		byte B = (w >> (24 - 8*(i%4))) & 0xff;
+		hex[2*i] = hb2char(B >> 4);
+		hex[2*i+1] = hb2char(B & 0x0f);
+	}
+	hex[2*i] = '\0';
+}
+
+void buffer_print(buffer b) {
+	printf("Buffer with %d bytes (%d words):\n", b.length, b.w_length);
+	int i;
+	for (i=0; i<b.length; i++) {
+		if (i%4 == 0) {
+			putchar(' ');
+		}
+		
+		word w = b.words[i>>2];
+		byte B = (w >> (24 - 8*(i&0x3))) & 0xff;
+		putchar(hb2char(B >> 4));
+		putchar(hb2char(B & 0x0f));
+	}
+	putchar('\n');
+	putchar('\n');
+}
+
+int buffer_is_equal(buffer a, buffer b) {
+	if (a.length != b.length) {
+		return 0;
+	}
+	for (int i=0; i<a.w_length; i++) {
+		if (a.words[i] != b.words[i]) {
+			return 0;
+		}
+	}
+	return 1;
 }

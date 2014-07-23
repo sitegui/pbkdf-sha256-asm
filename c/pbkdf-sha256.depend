@@ -1,0 +1,75 @@
+# depslib dependency file v1.0
+1405990669 source:c:\users\guilherme\programs\hmac-sha256-asm\c\main.c
+	"test/sha256.h"
+
+1405994643 c:\users\guilherme\programs\hmac-sha256-asm\c\sha256.h
+	"util.h"
+
+1405993439 c:\users\guilherme\programs\hmac-sha256-asm\c\util.h
+	<emscripten.h>
+
+1405994668 source:c:\users\guilherme\programs\hmac-sha256-asm\c\sha256.c
+	<string.h>
+	"sha256.h"
+
+1405994175 source:c:\users\guilherme\programs\hmac-sha256-asm\c\util.c
+	<stdio.h>
+	"util.h"
+
+1405994679 source:c:\users\guilherme\programs\hmac-sha256-asm\c\test\sha256.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	"sha256.h"
+	"../sha256.h"
+
+1405993310 c:\users\guilherme\programs\hmac-sha256-asm\c\test\sha256.h
+
+1405993253 source:c:\users\guilherme\programs\hmac-sha256-asm\c\hmac-sha256.c
+
+1406083773 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\main.c
+	<assert.h>
+	<stdio.h>
+	<string.h>
+	"util.h"
+
+1406083700 c:\users\guilherme\programs\pbkdf-sha256-asm\c\util.h
+	<emscripten.h>
+
+1406078885 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\hmac.c
+	<string.h>
+	"hmac.h"
+
+1406079950 c:\users\guilherme\programs\pbkdf-sha256-asm\c\hmac.h
+	"util.h"
+	"sha.h"
+
+1406080039 c:\users\guilherme\programs\pbkdf-sha256-asm\c\sha.h
+	"util.h"
+
+1406082267 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\pbkdf.c
+	"pbkdf.h"
+	"hmac.h"
+
+1406078761 c:\users\guilherme\programs\pbkdf-sha256-asm\c\pbkdf.h
+	"util.h"
+
+1406080488 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\sha.c
+	<string.h>
+	"sha.h"
+
+1406078908 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\test\sha.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	"sha.h"
+	"../sha.h"
+
+1405993310 c:\users\guilherme\programs\pbkdf-sha256-asm\c\test\sha.h
+
+1406083820 source:c:\users\guilherme\programs\pbkdf-sha256-asm\c\util.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"util.h"
+
