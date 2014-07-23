@@ -1,7 +1,21 @@
-#include <string.h>
+#include <assert.h>
 #include "sha.h"
+#include "util.h"
 
 #define S(n, x) ((x)<<(32-(n)) | (x)>>(n))
+
+void sha_process_block(sha *context, word *block);
+
+static const word H0[8] = {
+	0x6a09e667UL,
+	0xbb67ae85UL,
+	0x3c6ef372UL,
+	0xa54ff53aUL,
+	0x510e527fUL,
+	0x9b05688cUL,
+	0x1f83d9abUL,
+	0x5be0cd19UL
+};
 
 static const word K[64] = {
 	0x428a2f98UL, 0x71374491UL, 0xb5c0fbcfUL, 0xe9b5dba5UL,
@@ -22,49 +36,64 @@ static const word K[64] = {
 	0x90befffaUL, 0xa4506cebUL, 0xbef9a3f7UL, 0xc67178f2UL
 };
 
-sha sha_init() {
-	sha context = {
-		{ // Initial state
-			0x6a09e667UL,
-			0xbb67ae85UL,
-			0x3c6ef372UL,
-			0xa54ff53aUL,
-			0x510e527fUL,
-			0x9b05688cUL,
-			0x1f83d9abUL,
-			0x5be0cd19UL
-		},
-		0,
-		{ // Empty buffer
-			NULL,
-			0
-		}
-	};
+sha sha_alloc() {
+	sha context;
+	for (int i=0; i<8; i++) {
+		context.state[i] = H0[i];
+	}
+	context.blocks_done = 0;
+	context.partial_data = buffer_calloc(0);
 	
 	return context;
 }
 
+void sha_free(sha *context) {
+	buffer_free(&context->partial_data);
+}
+
 void sha_update(sha *context, buffer message) {
-	// Concat previous buffer with this one
+	buffer_push(&context->partial_data, message);
+	word length = context->partial_data.length;
 	
+	int offset = 0;
+	for (offset=0; offset+64<=length; offset+=64) {
+		sha_process_block(context, context->partial_data.words+offset);
+	}
+	
+	buffer_slice(&context->partial_data, offset);
 }
 
-buffer sha_end(sha *context) {
-	buffer b;
-	return b;
+void sha_end(sha *context, buffer *digest) {
+	// Prepare the pad
+	word pad_length = (context->partial_data.length>55 ? 128 : 64)-context->partial_data.length;
+	buffer pad = buffer_calloc(pad_length);
+	pad.words[0] = 0x80000000UL;
+	word total_length = 8*(64*context->blocks_done + context->partial_data.length);
+	
+	buffer_push(&context->partial_data, pad);
+	buffer_free(&pad);
+	context->partial_data.words[context->partial_data.w_length-1] = total_length;
+	
+	// Process final blocks (either 1 or 2)
+	sha_process_block(context, context->partial_data.words);
+	if (context->partial_data.length == 128) {
+		sha_process_block(context, context->partial_data.words+16);
+	}
+	
+	// Write the final value
+	assert(digest->length == 32);
+	for (int i=0; i<8; i++) {
+		digest->words[i] = context->state[i];
+	}
 }
 
-/*
-// Update the hash with a 512-bit message block
-static void update(word H[8], const word M[16]) {
-	word a = H[0],
-		b = H[1],
-		c = H[2],
-		d = H[3],
-		e = H[4],
-		f = H[5],
-		g = H[6],
-		h = H[7];
+// Process a 512-bit message block (16 words)
+void sha_process_block(sha *context, word *block) {
+	word *H = context->state;
+	word a = H[0], b = H[1],
+		c = H[2], d = H[3],
+		e = H[4], f = H[5],
+		g = H[6], h = H[7];
 	
 	word W[64];
 	
@@ -75,10 +104,9 @@ static void update(word H[8], const word M[16]) {
 		word sigma1 = S(6, e)^S(11, e)^S(25, e);
 		
 		if (i < 16) {
-			W[i] = M[i];
+			W[i] = block[i];
 		} else {
-			word x0 = W[i-15],
-				x1 = W[i-2];
+			word x0 = W[i-15], x1 = W[i-2];
 			word gamma0 = S(7, x0)^S(18, x0)^(x0>>3);
 			word gamma1 = S(17, x1)^S(19, x1)^(x1>>10);
 			W[i] = gamma1+W[i-7]+gamma0+W[i-16];
@@ -97,71 +125,10 @@ static void update(word H[8], const word M[16]) {
 		a = T1+T2;
 	}
 	
-	H[0] += a;
-	H[1] += b;
-	H[2] += c;
-	H[3] += d;
-	H[4] += e;
-	H[5] += f;
-	H[6] += g;
-	H[7] += h;
+	H[0] += a; H[1] += b;
+	H[2] += c; H[3] += d;
+	H[4] += e; H[5] += f;
+	H[6] += g; H[7] += h;
+	
+	context->blocks_done++;
 }
-
-void EMSCRIPTEN_KEEPALIVE sha256_raw(const byte *message, word length, word digest[8]) {
-	word H[8] = {
-		0x6a09e667UL,
-		0xbb67ae85UL,
-		0x3c6ef372UL,
-		0xa54ff53aUL,
-		0x510e527fUL,
-		0x9b05688cUL,
-		0x1f83d9abUL,
-		0x5be0cd19UL
-	};
-	
-	word original_length = length;
-	
-	// Process whole 64 byte blocks from the message
-	while (length >= 64) {
-		word block[16] = {0UL};
-		for (int i=0; i<64; i++) {
-			block[i>>2] |= message[i] << (24 - 8*(i&0x3));
-		}
-		update(H, block);
-		message += 64;
-		length -= 64;
-	}
-	
-	// Process final block
-	word block[16] = {0UL};
-	for (int i=0; i<length; i++) {
-		block[i>>2] |= message[i] << (24 - 8*(i&0x3));
-	}
-	block[length>>2] |= 1UL<<(31-8*(length&0x3)); // (put 0x80 after the last message byte)
-	if (length > 55) {
-		// We need one pre-final block
-		update(H, block);
-		
-		// Zero the whole block
-		for (int i=0; i<16; i++) {
-			block[i] = 0UL;
-		}
-	}
-	block[15] |= original_length<<3;
-	update(H, block);
-	
-	// Write to output
-	for (int i=0; i<8; i++) {
-		digest[i] = H[i];
-	}
-}
-
-void EMSCRIPTEN_KEEPALIVE sha256(const char *message, char digest[65]) {
-	word digest_raw[8];
-	sha256_raw((byte*)message, (word)strlen(message), digestRaw);
-	
-	for (int i=0; i<8; i++) {
-		encodeHex(digest_raw[i], digest+8*i);
-	}
-}
-*/

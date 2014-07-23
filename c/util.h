@@ -35,6 +35,10 @@ buffer buffer_create_from_hex(char *str);
 // Push more data to the end of a given buffer
 void buffer_push(buffer *b, buffer data);
 
+// Remove some words from the start of the buffer
+// length is the cut size in bytes and MUST be a multiple of 4
+void buffer_slice(buffer *b, word length);
+
 // Write the buffer content into the given target
 // The target must have enough space (2*b.length+1)
 void buffer_encode(buffer b, char *hex);

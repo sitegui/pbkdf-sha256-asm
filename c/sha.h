@@ -4,15 +4,22 @@
 #include "util.h"
 
 typedef struct {
-	word state[8]; // internal state
-	word blocks; // number of blocks already processed
-	buffer data; // data waiting to be hashed
+	word state[8]; // internal state (sha result = final state)
+	word blocks_done; // number of blocks already processed
+	buffer partial_data; // data waiting to be hashed
 } sha;
 
-sha sha_init();
+// Create the sha context
+sha sha_alloc();
 
+void sha_free(sha *context);
+
+// Process more data
 void sha_update(sha *context, buffer message);
 
-buffer sha_end(sha *context);
+// End the hash and write the result into digest
+// digest must be an allocated buffer with exactly 32 bytes
+// After this call, the context should be freed and discarded
+void sha_end(sha *context, buffer *digest);
 
 #endif // SHA_H

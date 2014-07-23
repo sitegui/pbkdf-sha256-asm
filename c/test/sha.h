@@ -1,6 +1,6 @@
-#ifndef TEST_SHA256_H
-#define TEST_SHA256_H
+#ifndef TEST_SHA_H
+#define TEST_SHA_H
 
-void testSha256();
+void test_sha();
 
-#endif // TEST_SHA256_H
+#endif // TEST_SHA_H

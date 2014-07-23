@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "util.h"
 
 // Convert a half byte to a char
@@ -29,6 +30,8 @@ void buffer_realloc(buffer *b, word length) {
 
 void buffer_free(buffer *b) {
 	free(b->words);
+	b->length = 0;
+	b->w_length = 0;
 	b->words = NULL;
 }
 
@@ -47,15 +50,18 @@ buffer buffer_create_from_str(char *str) {
 }
 
 buffer buffer_create_from_hex(char *str) {
-	char c1, c2;
-	byte B;
-	int length = strlen(str)>>1;
+	byte B, hh, lh;
+	int length = strlen(str);
+	assert(length%2 == 0);
+	length >>= 1;
 	buffer b = buffer_calloc(length);
 	
 	for (int i=0; i<length; i++) {
-		c1 = str[2*i];
-		c2 = str[2*i+1];
-		B = (char2hb(c1) << 4) + char2hb(c2);
+		hh = char2hb(str[2*i]);
+		lh = char2hb(str[2*i+1]);
+		assert(hh >= 0 && hh < 16);
+		assert(lh >= 0 && lh < 16);
+		B = (hh << 4) + lh;
 		b.words[i>>2] |= B << (24 - 8*(i%4));
 	}
 	
@@ -80,6 +86,20 @@ void buffer_push(buffer *b, buffer data) {
 			b->words[j>>2] |= B << (24 - 8*(j%4));
 		}
 	}
+}
+
+void buffer_slice(buffer *b, word length) {
+	assert(length <= b->length);
+	assert(length%4 == 0);
+	
+	if (length == b->length) {
+		buffer_free(b);
+		return;
+	}
+	
+	memmove(b->words, b->words+(length>>2), 4*b->w_length-length);
+	b->length -= length;
+	b->w_length -= length>>2;
 }
 
 void buffer_encode(buffer b, char *hex) {
