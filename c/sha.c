@@ -1,6 +1,5 @@
 #include <assert.h>
 #include "sha.h"
-#include "util.h"
 
 #define S(n, x) ((x)<<(32-(n)) | (x)>>(n))
 
@@ -36,7 +35,7 @@ static const word K[64] = {
 	0x90befffaUL, 0xa4506cebUL, 0xbef9a3f7UL, 0xc67178f2UL
 };
 
-sha sha_alloc() {
+sha sha_init() {
 	sha context;
 	for (int i=0; i<8; i++) {
 		context.state[i] = H0[i];
@@ -45,10 +44,6 @@ sha sha_alloc() {
 	context.partial_data = buffer_calloc(0);
 	
 	return context;
-}
-
-void sha_free(sha *context) {
-	buffer_free(&context->partial_data);
 }
 
 void sha_update(sha *context, buffer message) {
@@ -85,6 +80,9 @@ void sha_end(sha *context, buffer *digest) {
 	for (int i=0; i<8; i++) {
 		digest->words[i] = context->state[i];
 	}
+	
+	// Free the context
+	buffer_free(&context->partial_data);
 }
 
 // Process a 512-bit message block (16 words)

@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
-#include "sha.h"
+#include "../test.h"
 #include "../sha.h"
 
 static void check_hash(char *message, char *goal) {
@@ -8,7 +8,7 @@ static void check_hash(char *message, char *goal) {
 		goal_buffer = buffer_create_from_hex(goal),
 		digest = buffer_calloc(32);
 	
-	sha hash = sha_alloc();
+	sha hash = sha_init();
 	sha_update(&hash, message_buffer);
 	sha_end(&hash, &digest);
 	

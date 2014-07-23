@@ -1,28 +1,53 @@
-#include <string.h>
 #include "hmac.h"
 
-/*static const word i_pad[8] = {
-	0x5c5c5c5cUL, 0x5c5c5c5cUL, 0x5c5c5c5cUL, 0x5c5c5c5cUL,
-	0x5c5c5c5cUL, 0x5c5c5c5cUL, 0x5c5c5c5cUL, 0x5c5c5c5cUL
-};
-
-static const word o_pad[8] = {
-	0x36363636UL, 0x36363636UL, 0x36363636UL, 0x36363636UL,
-	0x36363636UL, 0x36363636UL, 0x36363636UL, 0x36363636UL
-};
-
-void EMSCRIPTEN_KEEPALIVE hmac_sha256_raw(const byte *key, word k_length, const byte *message, word m_length, word tag[8]) {
-	word digest[8];
+hmac hmac_init(buffer key) {
+	hmac mac;
+	buffer real_key; // always 64 bytes
 	
+	// Prepare the key
+	if (key.length <= 64) {
+		// Pad with zeroes
+		real_key = buffer_clone(key);
+		if (key.length < 64) {
+			buffer_realloc(&real_key, 64);
+		}
+	} else {
+		// Feed to the hash
+		real_key = buffer_calloc(32);
+		sha hash = sha_init();
+		sha_update(&hash, key);
+		sha_end(&hash, &real_key);
+		buffer_realloc(&real_key, 64);
+	}
 	
+	// Create the SHA context for the inner hash
+	for (int i=0; i<16; i++) {
+		real_key.words[i] ^= 0x36363636UL; // ipad
+	}
+	mac.hash_i = sha_init();
+	sha_update(&mac.hash_i, real_key);
 	
+	// Create the SHA context for the outer hash
+	for (int i=0; i<16; i++) {
+		real_key.words[i] ^= 0x6a6a6a6aUL; // opad^ipad
+	}
+	mac.hash_o = sha_init();
+	sha_update(&mac.hash_o, real_key);
+	
+	buffer_free(&real_key);
+	return mac;
 }
 
-void EMSCRIPTEN_KEEPALIVE hmac_sha256(const char *key, const char *message, char digest[65]) {
-	word digest_raw[8];
-	hmac_sha256_raw((byte*)key, strlen(key), (byte*)message, strlen(message), digest_raw);
+void hmac_update(hmac *context, buffer message) {
+	// Simply update the inner hash
+	sha_update(&context->hash_i, message);
+}
+
+void hmac_end(hmac *context, buffer *tag) {
+	// End the inner hash
+	sha_end(&context->hash_i, tag);
 	
-	for (int i=0; i<8; i++) {
-		encodeHex(digest_raw[i], digest+8*i);
-	}
-}*/
+	// End the outer hash
+	sha_update(&context->hash_o, *tag);
+	sha_end(&context->hash_o, tag);
+}

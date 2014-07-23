@@ -5,13 +5,16 @@
 #include "sha.h"
 
 typedef struct {
-	sha sha_ct0, sha_ct1;
+	sha hash_i, hash_o;
 } hmac;
 
 hmac hmac_init(buffer key);
 
 void hmac_update(hmac *context, buffer message);
 
-buffer hmac_end(hmac *context);
+// End the hmac and write the result into tag
+// tag must be an allocated buffer with exactly 32 bytes
+// After this call, the context is freed and discarded
+void hmac_end(hmac *context, buffer *tag);
 
 #endif // HMAC_H

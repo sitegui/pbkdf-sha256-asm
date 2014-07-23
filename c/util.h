@@ -31,6 +31,7 @@ void buffer_free(buffer *b);
 buffer buffer_create(byte *data, word length);
 buffer buffer_create_from_str(char *str);
 buffer buffer_create_from_hex(char *str);
+buffer buffer_clone(buffer b);
 
 // Push more data to the end of a given buffer
 void buffer_push(buffer *b, buffer data);

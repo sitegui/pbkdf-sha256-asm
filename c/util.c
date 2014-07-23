@@ -68,6 +68,18 @@ buffer buffer_create_from_hex(char *str) {
 	return b;
 }
 
+buffer buffer_clone(buffer b) {
+	buffer r;
+	r.length = b.length;
+	r.w_length = b.w_length;
+	r.words = malloc(r.w_length*sizeof(word));
+	for (int i=0; i<r.w_length; i++) {
+		r.words[i] = b.words[i];
+	}
+	
+	return r;
+}
+
 void buffer_push(buffer *b, buffer data) {
 	word prev_length = b->length;
 	int prev_w_length = b->w_length;
