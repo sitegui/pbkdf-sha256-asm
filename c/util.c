@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include "util.h"
+#include "memory.h"
 
 // Convert a half byte to a char
 #define hb2char(hb) ((hb)<10 ? '0'+(hb) : 'a'+((hb)-10))
@@ -12,7 +12,7 @@ buffer buffer_calloc(word length) {
 	buffer b;
 	b.length = length;
 	b.w_length = length%4 ? (length>>2)+1 : length>>2;
-	b.words = length ? calloc(b.w_length, sizeof(word)) : NULL;
+	b.words = length ? memory_calloc(b.w_length, sizeof(word)) : NULL;
 	return b;
 }
 
@@ -20,7 +20,7 @@ void buffer_realloc(buffer *b, word length) {
 	int prev_w_length = b->w_length;
 	b->length = length;
 	b->w_length = length%4 ? (length>>2)+1 : length>>2;
-	b->words = realloc(b->words, b->w_length*sizeof(word));
+	b->words = memory_realloc(b->words, b->w_length*sizeof(word));
 	
 	// Zero new memory
 	for (int i=prev_w_length; i<b->w_length; i++) {
@@ -35,7 +35,7 @@ void buffer_realloc(buffer *b, word length) {
 }
 
 void buffer_free(buffer *b) {
-	free(b->words);
+	memory_free(b->words);
 	b->length = 0;
 	b->w_length = 0;
 	b->words = NULL;
@@ -78,7 +78,7 @@ buffer buffer_clone(buffer b) {
 	buffer r;
 	r.length = b.length;
 	r.w_length = b.w_length;
-	r.words = r.length ? malloc(r.w_length*sizeof(word)) : NULL;
+	r.words = r.length ? memory_alloc(r.w_length*sizeof(word)) : NULL;
 	for (int i=0; i<r.w_length; i++) {
 		r.words[i] = b.words[i];
 	}
