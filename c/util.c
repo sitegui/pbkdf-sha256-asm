@@ -146,7 +146,7 @@ void buffer_encode(buffer b, char *hex) {
 }
 
 void buffer_print(buffer b) {
-	printf("Buffer with %d bytes (%d words):\n", b.length, b.w_length);
+	printf("Buffer with %lu bytes (%d words):\n", b.length, b.w_length);
 	int i;
 	for (i=0; i<b.length; i++) {
 		if (i%4 == 0) {

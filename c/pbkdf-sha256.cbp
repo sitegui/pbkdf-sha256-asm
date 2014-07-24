@@ -22,6 +22,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-DNDEBUG" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -31,26 +32,39 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="hmac-sha256.c">
+		<Unit filename="hmac.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="hmac-sha256.h" />
+		<Unit filename="hmac.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="pbkdf-sha256.c">
+		<Unit filename="memory.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="pbkdf-sha256.h" />
-		<Unit filename="sha256.c">
+		<Unit filename="memory.h" />
+		<Unit filename="pbkdf.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="sha256.h" />
-		<Unit filename="test/sha256.c">
+		<Unit filename="pbkdf.h" />
+		<Unit filename="sha.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="test/sha256.h" />
+		<Unit filename="sha.h" />
+		<Unit filename="test.h" />
+		<Unit filename="test/hmac.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="test/pbkdf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="test/sha.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="test/util.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="util.c">
 			<Option compilerVar="CC" />
 		</Unit>
