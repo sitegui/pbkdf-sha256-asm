@@ -1,0 +1,52 @@
+<!DOCTYPE>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>PBKDF-SHA256 asm.js</title>
+	<script src="pbkdf_min.js"></script>
+	<script src="js.js"></script>
+</head>
+
+<body>
+	<h1>PBKDF-SHA256 in asm.js</h1>
+
+	<h2>About</h2>
+	<p>See <a href='https://github.com/sitegui/pbkdf-sha256-asm'>https://github.com/sitegui/pbkdf-sha256-asm</a>
+	</p>
+
+	<h2>SHA256</h2>
+	<p>
+		Message:
+		<input id="sha-message" size="50">
+	</p>
+	<p>
+		Digest: <span id="sha-digest" style="font-family:monospace"></span>
+	</p>
+
+	<h2>HMAC-SHA256</h2>
+	<p>
+		Key:
+		<input id="hmac-key" size="50">
+		<br>Message:
+		<input id="hmac-message" size="50">
+	</p>
+	<p>
+		Tag: <span id="hmac-tag" style="font-family:monospace"></span>
+	</p>
+
+	<h2>PBKDF2-SHA256</h2>
+	<p>
+		Password:
+		<input id="pbkdf-password" size="50">
+		<br>Salt:
+		<input id="pbkdf-salt" size="50">
+		<br>Rounds:
+		<input id="pbkdf-rounds" size="10" value="1000">
+	</p>
+	<p>
+		Key: <span id="pbkdf-key" style="font-family:monospace"></span>
+	</p>
+</body>
+
+</html>
