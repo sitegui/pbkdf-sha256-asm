@@ -64,11 +64,13 @@ First you need to install [emscripten](https://github.com/kripken/emscripten/wik
 
 ### HMAC-SHA256
 These already include SHA256
+
 	emcc c/hmac.c c/sha.c c/util.c c/memory.c -o js/hmac.js
 	emcc c/hmac.c c/sha.c c/util.c c/memory.c -DNDEBUG -O2 -o js/hmac_min.js
 
 ### PBKDF2-SHA256
 These already include both HMAC and SHA256
+
 	emcc c/pbkdf.c c/hmac.c c/sha.c c/util.c c/memory.c -o js/pbkdf.js
 	emcc c/pbkdf.c c/hmac.c c/sha.c c/util.c c/memory.c -DNDEBUG -O2 -o js/pbkdf_min.js
 
