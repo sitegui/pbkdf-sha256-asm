@@ -37,6 +37,24 @@ if (key === '8fc2bcffbb4b1ac9b9de03588d390f3d9bf336c2c4422c90c158cc714225f629') 
 }
 ```
 
+## Using
+Include the file `js/pbkdf_min.js` and bind the functions with:
+```
+var sha = Module.cwrap('sha_simple', 'string', ['string'])
+var hmac = Module.cwrap('hmac_simple', 'string', ['string', 'string'])
+var pbkdf = Module.cwrap('pbkdf_simple', 'string', ['string', 'string', 'number', 'number'])
+```
+
+This will set three functions. All them return a 64-char hex-encoded string and receive UTF8 strings:
+
+* sha(message: string) -> string
+* hmac(key: string, message: string) -> string
+* pbkdf(password: string, salt: string, blockIndex: int, rounds: int) -> string
+
+Using is simple as `alert(sha('my-great-message'))`
+
+[See a simple example](http://sitegui.github.io/pbkdf-sha256-asm)
+
 ## Compiling
 First you need to install [emscripten](https://github.com/kripken/emscripten/wiki). When done, just run one of the commands bellow in the repository path:
 
