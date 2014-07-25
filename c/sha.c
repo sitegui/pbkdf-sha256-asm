@@ -99,6 +99,22 @@ void sha_end(sha *context, buffer *digest) {
 	buffer_free(&context->partial_data);
 }
 
+static char sha_result[65];
+char EMSCRIPTEN_KEEPALIVE *sha_simple(char *message) {
+	buffer message_buffer = buffer_create_from_str(message),
+		result_buffer = buffer_calloc(32);
+	
+	sha context = sha_init();
+	sha_update(&context, message_buffer);
+	sha_end(&context, &result_buffer);
+	buffer_encode(result_buffer, sha_result);
+	
+	buffer_free(&message_buffer);
+	buffer_free(&result_buffer);
+	
+	return sha_result;
+}
+
 // Process a 512-bit message block (16 words)
 void sha_process_block(sha *context, word *block) {
 	word *H = context->state;

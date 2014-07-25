@@ -48,5 +48,8 @@ void test_pbkdf() {
 	
 	check_pbkdf_str("passwordPASSWORDpassword", "saltSALTsaltSALTsaltSALTsaltSALTsalt", 4096, "348c89dbcbd32b2f32d814b8116e84cf2b17347ebc1800181c4e2a1fb8dd53e1c635518c7dac47e9");
 	check_pbkdf((byte*)"pass\0word", 9, (byte*)"sa\0lt", 5, 4096, "89b69d0516f829893c696226650a8687");
+	
+	assert(strcmp(pbkdf_simple("Password", "Salt", 0, 1000), "fd1dc1b9569249caa53d3489526bc4eaff0eb8d488138a1561f50b9faca5cefd") == 0);
+	
 	puts("pbkdf: OK!");
 }

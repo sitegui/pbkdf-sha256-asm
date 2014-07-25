@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include "../test.h"
 #include "../sha.h"
 
@@ -230,5 +231,8 @@ void test_sha() {
 	for (int i=0; i<n; i++) {
 		check_hash(messages[i], hashes[i]);
 	}
+	
+	assert(strcmp(sha_simple("Hello"), "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969") == 0);
+	
 	puts("sha: OK!");
 }

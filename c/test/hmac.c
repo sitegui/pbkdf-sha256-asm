@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 #include "../test.h"
 #include "../hmac.h"
 
@@ -236,5 +237,8 @@ void test_hmac() {
 	for (int i=0; i<n; i++) {
 		check_tag(keys[i], messages[i], tags[i]);
 	}
+	
+	assert(strcmp(hmac_simple("Key", "Message"), "507285548137b5424eb5572c46496631b7ade8e88ac323c529fa142def26ffa1") == 0);
+	
 	puts("hmac: OK!");
 }

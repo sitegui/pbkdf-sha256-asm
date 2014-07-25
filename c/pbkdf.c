@@ -31,3 +31,19 @@ void pbkdf(buffer password, buffer salt, word block_index, int rounds, buffer *k
 	buffer_free(&temp);
 	hmac_free(&base_mac);
 }
+
+static char pbkdf_result[65];
+char EMSCRIPTEN_KEEPALIVE *pbkdf_simple(char *password, char *salt, word block_index, int rounds) {
+	buffer password_buffer = buffer_create_from_str(password),
+		salt_buffer = buffer_create_from_str(salt),
+		result_buffer = buffer_calloc(32);
+	
+	pbkdf(password_buffer, salt_buffer, block_index, rounds, &result_buffer);
+	buffer_encode(result_buffer, pbkdf_result);
+	
+	buffer_free(&password_buffer);
+	buffer_free(&salt_buffer);
+	buffer_free(&result_buffer);
+	
+	return pbkdf_result;
+}

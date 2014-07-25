@@ -65,3 +65,21 @@ void hmac_end(hmac *context, buffer *tag) {
 	sha_update(&context->hash_o, *tag);
 	sha_end(&context->hash_o, tag);
 }
+
+static char hmac_result[65];
+char EMSCRIPTEN_KEEPALIVE *hmac_simple(char *key, char *message) {
+	buffer key_buffer = buffer_create_from_str(key),
+		message_buffer = buffer_create_from_str(message),
+		result_buffer = buffer_calloc(32);
+	
+	hmac context = hmac_init(key_buffer);
+	hmac_update(&context, message_buffer);
+	hmac_end(&context, &result_buffer);
+	buffer_encode(result_buffer, hmac_result);
+	
+	buffer_free(&key_buffer);
+	buffer_free(&message_buffer);
+	buffer_free(&result_buffer);
+	
+	return hmac_result;
+}

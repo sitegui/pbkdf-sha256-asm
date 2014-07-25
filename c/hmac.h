@@ -24,4 +24,8 @@ void hmac_update(hmac *context, buffer message);
 // After this call, the context is freed and discarded
 void hmac_end(hmac *context, buffer *tag);
 
+// A simple interface for mac-ing a C string
+// Return a pointer to a internal storage with the hex-encoded output (64+1 bytes)
+char EMSCRIPTEN_KEEPALIVE *hmac_simple(char *key, char *message);
+
 #endif // HMAC_H

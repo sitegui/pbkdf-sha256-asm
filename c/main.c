@@ -1,7 +1,7 @@
 #include "test.h"
 #include "memory.h"
 
-int main() {	
+int main() {
     test_buffer_hex();
     memory_assert_empty();
     

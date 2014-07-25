@@ -58,7 +58,7 @@ void test_buffer_realloc() {
 	assert(strcmp(hex, "0000000000") == 0);
 	
 	buffer_free(&b);
-	puts("buffer_push: OK!");
+	puts("buffer_realloc: OK!");
 }
 
 void test_buffer_slice() {

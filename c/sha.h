@@ -25,4 +25,8 @@ void sha_update(sha *context, buffer message);
 // After this call, the context is freed and can't be reused
 void sha_end(sha *context, buffer *digest);
 
+// A simple interface for hashing a C string
+// Return a pointer to a internal storage with the hex-encoded output (64+1 bytes)
+char EMSCRIPTEN_KEEPALIVE *sha_simple(char *message);
+
 #endif // SHA_H
