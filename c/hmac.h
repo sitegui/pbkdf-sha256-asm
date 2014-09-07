@@ -28,4 +28,9 @@ void hmac_end(hmac *context, buffer *tag);
 // Return a pointer to a internal storage with the hex-encoded output (64+1 bytes)
 char EMSCRIPTEN_KEEPALIVE *hmac_simple(char *key, char *message);
 
+// A simple interface for mac-ing a hex-encoded C string
+// Both key and message must be hex-encoded strings
+// Return a pointer to a internal storage with the hex-encoded output (64+1 bytes)
+char EMSCRIPTEN_KEEPALIVE *hmac_simple_hex(char *key, char *message);
+
 #endif // HMAC_H

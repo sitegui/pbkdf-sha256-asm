@@ -11,4 +11,9 @@ void pbkdf(buffer password, buffer salt, word block_index, int rounds, buffer *k
 // Return a pointer to a internal storage with the hex-encoded output (64+1 bytes)
 char EMSCRIPTEN_KEEPALIVE *pbkdf_simple(char *password, char *salt, word block_index, int rounds);
 
+// A simple interface for pbkdf
+// Both password and salt must be hex-encoded strings
+// Return a pointer to a internal storage with the hex-encoded output (64+1 bytes)
+char EMSCRIPTEN_KEEPALIVE *pbkdf_simple_hex(char *password, char *salt, word block_index, int rounds);
+
 #endif // PBKDF_H

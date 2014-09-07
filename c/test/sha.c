@@ -8,13 +8,13 @@ static void check_hash(char *message, char *goal) {
 	buffer message_buffer = buffer_create_from_str(message),
 		goal_buffer = buffer_create_from_hex(goal),
 		digest = buffer_calloc(32);
-	
+
 	sha hash = sha_init();
 	sha_update(&hash, message_buffer);
 	sha_end(&hash, &digest);
-	
+
 	assert(buffer_is_equal(digest, goal_buffer));
-	
+
 	buffer_free(&message_buffer);
 	buffer_free(&goal_buffer);
 	buffer_free(&digest);
@@ -231,8 +231,9 @@ void test_sha() {
 	for (int i=0; i<n; i++) {
 		check_hash(messages[i], hashes[i]);
 	}
-	
+
 	assert(strcmp(sha_simple("Hello"), "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969") == 0);
-	
+	assert(strcmp(sha_simple_hex("48656C6c6f"), "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969") == 0);
+
 	puts("sha: OK!");
 }

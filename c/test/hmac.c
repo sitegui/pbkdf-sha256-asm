@@ -9,13 +9,13 @@ static void check_tag(char *key, char *message, char *goal) {
 		message_buffer = buffer_create_from_str(message),
 		goal_buffer = buffer_create_from_hex(goal),
 		tag = buffer_calloc(32);
-	
+
 	hmac mac = hmac_init(key_buffer);
 	hmac_update(&mac, message_buffer);
 	hmac_end(&mac, &tag);
-	
+
 	assert(buffer_is_equal(tag, goal_buffer));
-	
+
 	buffer_free(&key_buffer);
 	buffer_free(&message_buffer);
 	buffer_free(&goal_buffer);
@@ -237,8 +237,9 @@ void test_hmac() {
 	for (int i=0; i<n; i++) {
 		check_tag(keys[i], messages[i], tags[i]);
 	}
-	
+
 	assert(strcmp(hmac_simple("Key", "Message"), "507285548137b5424eb5572c46496631b7ade8e88ac323c529fa142def26ffa1") == 0);
-	
+	assert(strcmp(hmac_simple_hex("4b6579", "4D657373616765"), "507285548137b5424eb5572c46496631b7ade8e88ac323c529fa142def26ffa1") == 0);
+
 	puts("hmac: OK!");
 }

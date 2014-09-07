@@ -13,7 +13,7 @@ This is my own implementation of three related crypto algorithms:
 ## Benchmark
 A small benchmark comparing this implementation to [CryptoJS](https://code.google.com/p/crypto-js/), a crypto lib written directly in JS.
 
-The time that it took to execute 5000 rounds of PBKDF over input `{message: 'password', salt: 'salt'}` was measured and is represented in the graph bellow in rounds per second. That is, what should be the value of the rounds parameter if one want the function to return in 1 second.
+The time that it took to execute 5000 rounds of PBKDF over input `message='password', salt='salt'` was measured and is represented in the graph bellow in rounds per second. That is, what should be the value of the rounds parameter if one want the function to return in 1 second.
 
 ![Graph](https://raw.githubusercontent.com/sitegui/pbkdf-sha256-asm/master/asm.png)
 
@@ -55,27 +55,35 @@ Using is simple as `alert(sha('my-great-message'))`
 
 [See a simple example](http://sitegui.github.io/pbkdf-sha256-asm)
 
+### Hex input
+Each one of the 3 functions have another version that takes a hex-string (like `'fa40fa'`) as input:
+```
+var shaHex = Module.cwrap('sha_simple_hex', 'string', ['string'])
+var hmacHex = Module.cwrap('hmac_simple_hex', 'string', ['string', 'string'])
+var pbkdfHex = Module.cwrap('pbkdf_simple_hex', 'string', ['string', 'string', 'number', 'number'])
+```
+
 ## Compiling
 First you need to install [emscripten](https://github.com/kripken/emscripten/wiki). When done, just run one of the commands bellow in the repository path:
 
 ### SHA256
 	emcc c/sha.c c/util.c c/memory.c -o js/sha.js
-	emcc c/sha.c c/util.c c/memory.c -DNDEBUG -O2 -o js/sha_min.js
+	emcc c/sha.c c/util.c c/memory.c -DNDEBUG -O2 --memory-init-file 0 -o js/sha_min.js
 
 ### HMAC-SHA256
 These already include SHA256
 
 	emcc c/hmac.c c/sha.c c/util.c c/memory.c -o js/hmac.js
-	emcc c/hmac.c c/sha.c c/util.c c/memory.c -DNDEBUG -O2 -o js/hmac_min.js
+	emcc c/hmac.c c/sha.c c/util.c c/memory.c -DNDEBUG -O2 --memory-init-file 0 -o js/hmac_min.js
 
 ### PBKDF2-SHA256
 These already include both HMAC and SHA256
 
 	emcc c/pbkdf.c c/hmac.c c/sha.c c/util.c c/memory.c -o js/pbkdf.js
-	emcc c/pbkdf.c c/hmac.c c/sha.c c/util.c c/memory.c -DNDEBUG -O2 -o js/pbkdf_min.js
+	emcc c/pbkdf.c c/hmac.c c/sha.c c/util.c c/memory.c -DNDEBUG -O2 --memory-init-file 0 -o js/pbkdf_min.js
 
 ### Tests
-	emcc c/main.c c/test/hmac.c c/test/pbkdf.c c/test/sha.c c/test/util.c c/pbkdf.c c/hmac.c c/sha.c c/util.c c/memory.c -o test.html
-	emcc c/main.c c/test/hmac.c c/test/pbkdf.c c/test/sha.c c/test/util.c c/pbkdf.c c/hmac.c c/sha.c c/util.c c/memory.c -DNDEBUG -O2 -o test_min.html
+	emcc c/main.c c/test/hmac.c c/test/pbkdf.c c/test/sha.c c/test/util.c c/pbkdf.c c/hmac.c c/sha.c c/util.c c/memory.c -o js/test/test.html
+	emcc c/main.c c/test/hmac.c c/test/pbkdf.c c/test/sha.c c/test/util.c c/pbkdf.c c/hmac.c c/sha.c c/util.c c/memory.c -DNDEBUG -O2 --memory-init-file 0 -o js/test/test_min.html
 And then just open the .html page. It should log some 'OK!' messages in the console and also the benchmark result.
 The `NDEBUG` flag turns off memory checks that I've used to make sure all allocated memory was freed correctly.

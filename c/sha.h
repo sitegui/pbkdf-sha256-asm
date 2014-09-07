@@ -29,4 +29,8 @@ void sha_end(sha *context, buffer *digest);
 // Return a pointer to a internal storage with the hex-encoded output (64+1 bytes)
 char EMSCRIPTEN_KEEPALIVE *sha_simple(char *message);
 
+// A simple interface for hashing a hex-encoded C string
+// Return a pointer to a internal storage with the hex-encoded output (64+1 bytes)
+char EMSCRIPTEN_KEEPALIVE *sha_simple_hex(char *message);
+
 #endif // SHA_H

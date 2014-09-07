@@ -3,7 +3,8 @@
 
 #define S(n, x) ((x)<<(32-(n)) | (x)>>(n))
 
-void sha_process_block(sha *context, word *block);
+static void _process_block(sha *context, word *block);
+static void _simple(buffer message, char *result);
 
 static const word H0[8] = {
 	0x6a09e667UL,
@@ -42,7 +43,7 @@ sha sha_init() {
 	}
 	context.blocks_done = 0;
 	context.partial_data = buffer_calloc(0);
-	
+
 	return context;
 }
 
@@ -52,21 +53,21 @@ void sha_free(sha *context) {
 
 sha sha_clone(sha context) {
 	sha hash = context;
-	
+
 	hash.partial_data = buffer_clone(context.partial_data);
-	
+
 	return hash;
 }
 
 void sha_update(sha *context, buffer message) {
 	buffer_push(&context->partial_data, message);
 	word length = context->partial_data.length;
-	
+
 	int offset = 0;
 	for (offset=0; offset+64<=length; offset+=64) {
-		sha_process_block(context, context->partial_data.words+offset);
+		_process_block(context, context->partial_data.words+offset);
 	}
-	
+
 	if (offset) {
 		buffer_slice(&context->partial_data, offset);
 	}
@@ -78,59 +79,71 @@ void sha_end(sha *context, buffer *digest) {
 	buffer pad = buffer_calloc(pad_length);
 	pad.words[0] = 0x80000000UL;
 	word total_length = 8*(64*context->blocks_done + context->partial_data.length);
-	
+
 	buffer_push(&context->partial_data, pad);
 	buffer_free(&pad);
 	context->partial_data.words[context->partial_data.w_length-1] = total_length;
-	
+
 	// Process final blocks (either 1 or 2)
-	sha_process_block(context, context->partial_data.words);
+	_process_block(context, context->partial_data.words);
 	if (context->partial_data.length == 128) {
-		sha_process_block(context, context->partial_data.words+16);
+		_process_block(context, context->partial_data.words+16);
 	}
-	
+
 	// Write the final value
 	assert(digest->length == 32);
 	for (int i=0; i<8; i++) {
 		digest->words[i] = context->state[i];
 	}
-	
+
 	// Free the context
 	buffer_free(&context->partial_data);
 }
 
-static char sha_result[65];
 char EMSCRIPTEN_KEEPALIVE *sha_simple(char *message) {
-	buffer message_buffer = buffer_create_from_str(message),
-		result_buffer = buffer_calloc(32);
-	
-	sha context = sha_init();
-	sha_update(&context, message_buffer);
-	sha_end(&context, &result_buffer);
-	buffer_encode(result_buffer, sha_result);
-	
+	static char result[65];
+	buffer message_buffer = buffer_create_from_str(message);
+	_simple(message_buffer, result);
 	buffer_free(&message_buffer);
+
+	return result;
+}
+
+char EMSCRIPTEN_KEEPALIVE *sha_simple_hex(char *message) {
+	static char result[65];
+	buffer message_buffer = buffer_create_from_hex(message);
+	_simple(message_buffer, result);
+	buffer_free(&message_buffer);
+
+	return result;
+}
+
+// result = ENCODE_HEX(SHA(message))
+static void _simple(buffer message, char *result) {
+	buffer result_buffer = buffer_calloc(32);
+	sha context = sha_init();
+	sha_update(&context, message);
+	sha_end(&context, &result_buffer);
+	buffer_encode(result_buffer, result);
 	buffer_free(&result_buffer);
-	
-	return sha_result;
 }
 
 // Process a 512-bit message block (16 words)
-void sha_process_block(sha *context, word *block) {
+static void _process_block(sha *context, word *block) {
 	word *H = context->state;
 	word a = H[0], b = H[1],
 		c = H[2], d = H[3],
 		e = H[4], f = H[5],
 		g = H[6], h = H[7];
-	
+
 	word W[64];
-	
+
 	for (int i=0; i<64; i++) {
 		word Ch = (e & f)^((~e) & g);
 		word Maj = (a & b)^(a & c)^(b & c);
 		word sigma0 = S(2, a)^S(13, a)^S(22, a);
 		word sigma1 = S(6, e)^S(11, e)^S(25, e);
-		
+
 		if (i < 16) {
 			W[i] = block[i];
 		} else {
@@ -139,10 +152,10 @@ void sha_process_block(sha *context, word *block) {
 			word gamma1 = S(17, x1)^S(19, x1)^(x1>>10);
 			W[i] = gamma1+W[i-7]+gamma0+W[i-16];
 		}
-		
+
 		word T1 = h+sigma1+Ch+K[i]+W[i];
 		word T2 = sigma0+Maj;
-		
+
 		h = g;
 		g = f;
 		f = e;
@@ -152,11 +165,11 @@ void sha_process_block(sha *context, word *block) {
 		b = a;
 		a = T1+T2;
 	}
-	
+
 	H[0] += a; H[1] += b;
 	H[2] += c; H[3] += d;
 	H[4] += e; H[5] += f;
 	H[6] += g; H[7] += h;
-	
+
 	context->blocks_done++;
 }

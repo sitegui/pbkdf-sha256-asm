@@ -6,7 +6,7 @@
 
 // Convert a half byte to a char
 #define hb2char(hb) ((hb)<10 ? '0'+(hb) : 'a'+((hb)-10))
-#define char2hb(c) ((c)<'a' ? (c)-'0' : (c)-'a'+10)
+#define char2hb(c) ((c)<'A' ? (c)-'0' : ((c)<'a' ? (c)-'A'+10 : (c)-'a'+10))
 
 buffer buffer_calloc(word length) {
 	buffer b;
@@ -21,12 +21,12 @@ void buffer_realloc(buffer *b, word length) {
 	b->length = length;
 	b->w_length = length%4 ? (length>>2)+1 : length>>2;
 	b->words = memory_realloc(b->words, b->w_length*sizeof(word));
-	
+
 	// Zero new memory
 	for (int i=prev_w_length; i<b->w_length; i++) {
 		b->words[i] = 0UL;
 	}
-	
+
 	// Zero previous memory
 	for (word i=length; i<4*b->w_length; i++) {
 		word mask = 0xff << (24 - 8*(i%4));
@@ -43,11 +43,11 @@ void buffer_free(buffer *b) {
 
 buffer buffer_create(byte *data, word length) {
 	buffer b = buffer_calloc(length);
-	
+
 	for (int i=0; i<length; i++) {
 		b.words[i>>2] |= data[i] << (24 - 8*(i%4));
 	}
-	
+
 	return b;
 }
 
@@ -61,7 +61,7 @@ buffer buffer_create_from_hex(char *str) {
 	assert(length%2 == 0);
 	length >>= 1;
 	buffer b = buffer_calloc(length);
-	
+
 	for (int i=0; i<length; i++) {
 		hh = char2hb(str[2*i]);
 		lh = char2hb(str[2*i+1]);
@@ -70,7 +70,7 @@ buffer buffer_create_from_hex(char *str) {
 		B = (hh << 4) + lh;
 		b.words[i>>2] |= B << (24 - 8*(i%4));
 	}
-	
+
 	return b;
 }
 
@@ -82,7 +82,7 @@ buffer buffer_clone(buffer b) {
 	for (int i=0; i<r.w_length; i++) {
 		r.words[i] = b.words[i];
 	}
-	
+
 	return r;
 }
 
@@ -103,9 +103,9 @@ void buffer_xor(buffer *dest, buffer origin) {
 void buffer_push(buffer *b, buffer data) {
 	word prev_length = b->length;
 	int prev_w_length = b->w_length;
-	
+
 	buffer_realloc(b, b->length+data.length);
-	
+
 	// Copy new data
 	if (prev_length % 4 == 0) {
 		// Aligned: copy word by word
@@ -123,12 +123,12 @@ void buffer_push(buffer *b, buffer data) {
 void buffer_slice(buffer *b, word length) {
 	assert(length <= b->length);
 	assert(length%4 == 0);
-	
+
 	if (length == b->length) {
 		buffer_free(b);
 		return;
 	}
-	
+
 	memmove(b->words, b->words+(length>>2), 4*b->w_length-length);
 	b->length -= length;
 	b->w_length -= length>>2;
@@ -152,7 +152,7 @@ void buffer_print(buffer b) {
 		if (i%4 == 0) {
 			putchar(' ');
 		}
-		
+
 		word w = b.words[i>>2];
 		byte B = (w >> (24 - 8*(i&0x3))) & 0xff;
 		putchar(hb2char(B >> 4));
